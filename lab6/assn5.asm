@@ -333,11 +333,13 @@ BRz EQUALSZERO 		; Check if R2 is zero
 ADD R5, R1, R2
 BRp largerNumberNeg 	; R2 is larger, R1 is smaller
 BRn smallerNumberNeg 	; R1 is larger, R2 is smaller
+BRz zeroNeg
 
 FORNEGATIVE2
 ADD R5, R1, R2 			
 BRp largerNumberNeg2 	; R1 is larger, R2 is smaller
 BRn smallerNumberNeg2 	; R2 is larger, R1 is smaller
+BRz zeroNeg
 
 FORNEGATIVEBOTH
 NOT R3, R1 	
@@ -488,11 +490,41 @@ SKIPSTEP6
 ADD R3, R1, #0
 BR PRINTTHIS
 
+zeroNeg
+ADD R1, R1, #0
+BRn CONVR1
+CHCK1
+ADD R2, R2, #0
+BRn CONVR2
+CHCK2
+ADD R3, R1, #0
+ADD R2, R2, #-1
+BRnz SKIPSTEP7
+FOR_LOOP7
+	ADD R1, R1, R3
+	ADD R1, R1, #0
+	BRn OVERFLOW
+	ADD R2, R2, #-1
+	BRp FOR_LOOP7
+SKIPSTEP7
+NOT R1, R1
+ADD R1, R1, #1
+ADD R3, R1, #0
+BR PRINTTHIS
+
 OVERFLOW
 LEA R0, overflowissue
 PUTS
 BR MULTIPLYNUMS_END
 
+CONVR1
+NOT R1, R1
+ADD R1, R1, #1
+BR CHCK1
+CONVR2
+NOT R2, R2
+ADD R2, R2, #1
+BR CHCK2
 CONVERTR1 		;Converting without same name
 NOT R1, R1
 ADD R1, R1, #1
