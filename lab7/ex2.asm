@@ -1,0 +1,137 @@
+;=================================================
+; Name: Luk, Ryan
+; Username: rluk001
+; Lab: Lab 06
+; Lab section: 022
+; TA: Bryan Marsh
+;=================================================
+.orig x3000
+
+LD R6, getString
+JSRR R6
+
+LD R6, checkPalindrome
+JSRR R6
+
+HALT
+getString .FILL x3200
+checkPalindrome .FILL x3400
+
+.orig x3200
+
+ST R7, R7_BACKUP_3200
+
+LEA R0, PROMPT
+PUTS
+
+LD R1, newLine
+NOT R1, R1
+ADD R1, R1, #1
+LD R6, userArray
+LD R5, COUNT
+
+RESTART
+	GETC
+	OUT
+	ADD R2, R1, R0
+	BRz LOOP_END
+	ADD R5, R5, #1
+	STR R0, R6, #0
+	ADD R6, R6, #1
+	BR RESTART
+LOOP_END
+
+LD R7, R7_BACKUP_3200
+
+RET
+userArray .FILL x3300
+R7_BACKUP_3200 .BLKW #1
+newLine .FILL x0A
+COUNT .FILL #0
+PROMPT .STRINGZ "Please enter a string followed by an ENTER:\n"
+
+.orig x3400
+ST R0, R0_BACKUP_3400
+ST R5, R5_BACKUP_3400
+ST R7, R7_BACKUP_3400
+
+LD R2, INCREMENT
+ADD R4, R5, #0
+ADD R5, R5, #-1
+CHECKODD
+	ADD R4, R4, #-2
+	BRz EVEN
+	BRp CHECKODD
+	LD R0, myArray
+	LD R1, myArray
+	ADD R0, R0, R2
+	ADD R1, R1, R5
+	LDR R3, R0, #0
+	LDR R4, R1, #0
+	ADD R2, R2, #1
+	ADD R5, R5, #-1
+	BRz PALINDROME
+	NOT R4, R4
+	ADD R4, R4, #1
+	ADD R3, R3, R4
+	BRz CHECKODD
+	BRnp NOTPALINDROME
+	
+EVEN
+	LD R0, myArray
+	LD R1, myArray
+	ADD R0, R0, R2
+	ADD R1, R1, R5
+	LDR R3, R0, #0
+	LDR R4, R1, #0
+	ADD R2, R2, #1
+	ADD R5, R5, #-1
+	ADD R6, R5, #0
+	NOT R6, R5
+	ADD R6, R6, #1
+	ADD R6, R6, R2
+	BRp CONT
+	NOT R4, R4
+	ADD R4, R4, #1
+	ADD R3, R3, R4
+	BRz EVEN
+	BRnp NOTPALINDROME
+	
+	CONT
+	NOT R4, R4
+	ADD R4, R4, #1
+	ADD R3, R3, R4
+	BRz PALINDROME
+	BRnp NOTPALINDROME
+	
+NOTPALINDROME
+LD R4, NUMEROZERO
+LEA R0, notpDrome
+PUTS
+
+BR ENDLOOP
+
+PALINDROME
+LD R4, NUMEROUNO
+LEA R0, pDrome
+PUTS
+
+ENDLOOP
+
+LD R0, R0_BACKUP_3400
+LD R5, R5_BACKUP_3400
+LD R7, R7_BACKUP_3400
+
+RET
+
+R0_BACKUP_3400 .BLKW #1
+R5_BACKUP_3400 .BLKW #1
+R7_BACKUP_3400 .BLKW #1
+
+myArray .FILL x3300
+INCREMENT .FILL #0
+NUMEROUNO .FILL #1
+NUMEROZERO .FILL #0
+pDrome .STRINGZ "This is a palindrome :)\n"
+notpDrome .STRINGZ "This is not a palindrome :(\n"
+.END
