@@ -16,7 +16,7 @@ JSR MENU
 
 LD R2, NUMONE
 ADD R2, R0, R2
-BRz STEP1
+BRp STEP1
 LD R6, ALL_MACHINES_BUSY 
 JSRR R6
 BR INFLOOP
@@ -24,7 +24,7 @@ BR INFLOOP
 STEP1
 LD R2, NUMTWO
 ADD R2, R0, R2
-BRz STEP2 
+BRp STEP2 
 LD R6, ALL_MACHINES_FREE
 JSRR R6
 BR INFLOOP
@@ -32,7 +32,7 @@ BR INFLOOP
 STEP2
 LD R2, NUMTHREE
 ADD R2, R0, R2
-BRz STEP3
+BRp STEP3
 LD R6, NUM_BUSY_MACHINES
 JSRR R6
 BR INFLOOP
@@ -40,7 +40,7 @@ BR INFLOOP
 STEP3
 LD R2, NUMFOUR
 ADD R2, R0, R2
-BRz STEP4
+BRp STEP4
 LD R6, NUM_FREE_MACHINES
 JSRR R6
 BR INFLOOP
@@ -48,17 +48,18 @@ BR INFLOOP
 STEP4
 ;LD R2, NUMFIVE
 ;ADD R2, R0, R2
-;BRz STEP5 
+;BRp STEP5 
 ;LD R6, MACHINE_STATUS
 ;JSRR R6
 
 ;STEP5
 ;LD R2, NUMSIX
 ;ADD R2, R0, R2
-;BRz STEP6
+;BRp STEP6
 ;LD R6, FIRST_FREE
 ;JSRR R6
 
+;STEP6
 LD R2, NUMSEVEN
 ADD R2, R0, R2
 BRz INFLOOP_END
@@ -102,13 +103,13 @@ PUTS
 GETC
 OUT
 
-LD R1, ONE
-LD R2, SEVEN
+LD R3, ONE
+LD R4, SEVEN
 
-ADD R1, R0, R1
+ADD R3, R0, R3
 BRn NEXT
 
-ADD R2, R0, R2
+ADD R4, R0, R4
 BRp NEXT
 
 LD R7, R7_BACKUP_3200
@@ -120,7 +121,7 @@ ONE .FILL #-49
 SEVEN .FILL #-55
 newLineChar .FILL x0A
 CHOICES .STRINGZ "Please choose any number from 1-7: "
-MENUPRINTOUT .STRINGZ "**********************\n* The Busyness Server *\n1. Check to see whether all machines are busy\n2. Check to see whether all machines are free\n3. Report the number of busy machines\n4. Report the number of free machines\n5. Report the status of machine n\n6. Report the number of the first available machine\n7. Quit\n"
+MENUPRINTOUT .STRINGZ "**********************\n* The Busyness Server ************************\n1. Check to see whether all machines are busy\n2. Check to see whether all machines are free\n3. Report the number of busy machines\n4. Report the number of free machines\n5. Report the status of machine n\n6. Report the number of the first available machine\n7. Quit\n"
 
 .orig x3400
 ST R7, R7_BACKUP_3400
@@ -145,12 +146,12 @@ loop_END
 BR GETZERO
 
 FAIL
-LEA R0, string2
+LEA R0, string1
 PUTS
 BR ENDLOOP
 
 GETZERO
-LEA R0, string1
+LEA R0, string2
 PUTS
 
 ENDLOOP
@@ -235,7 +236,7 @@ LEA R0, output
 PUTS
 
 LD R5, SUB2
-ADD R4, R2, R5
+ADD R0, R2, R5
 BRp CONT
 
 LD R5, ASCII_CONVERT
@@ -247,13 +248,14 @@ CONT
 LD R0, ASCII_ONE
 OUT
 
-ADD R4, R4, R5
+ADD R0, R0, R5
 OUT
+
+ENDTHISLOOP
 
 LEA R0, output2
 PUTS
 
-ENDTHISLOOP
 LD R7, R7_BACKUP_3800
 
 RET
@@ -293,7 +295,7 @@ LEA R0, output3
 PUTS
 
 LD R5, SUB3
-ADD R4, R2, R5
+ADD R0, R2, R5
 BRp CONTINUETHIS
 
 LD R5, ASCII_CONVERT2
@@ -305,13 +307,13 @@ CONTINUETHIS
 LD R0, ASCII_ONE2
 OUT
 
-ADD R4, R4, R5
+ADD R0, R0, R5
 OUT
+
+ENDTHISLOOP2
 
 LEA R0, output4
 PUTS
-
-ENDTHISLOOP2
 
 LD R7, R7_BACKUP_4000
 
