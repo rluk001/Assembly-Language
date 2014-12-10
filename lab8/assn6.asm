@@ -164,8 +164,7 @@ MENUPRINTOUT .STRINGZ "**********************\n* The Busyness Server *\n1. Check
 .orig x3400
 ST R7, R7_BACKUP_3400
 
-LD R6, VECTOR
-JSRR R6
+LDI R5, VECTOR
 
 ADD R1, R5, #0
 
@@ -215,8 +214,7 @@ string2 .STRINGZ "\nAll machines are busy.\n"
 .orig x3600
 ST R7, R7_BACKUP_3600
 
-LD R6, VECTOR2
-JSRR R6
+LDI R5, VECTOR2
 
 ADD R1, R5, #0
 LD R2, ZEROSET2
@@ -265,8 +263,7 @@ string4 .STRINGZ "\nNot all machines are free.\n"
 .orig x3800
 ST R7, R7_BACKUP_3800
 
-LD R6, VECTOR3
-JSRR R6
+LDI R5, VECTOR3
 
 ADD R1, R5, #0
 
@@ -335,8 +332,7 @@ output2 .STRINGZ " busy machines.\n"
 .orig x4000
 ST R7, R7_BACKUP_4000
 
-LD R6, VECTOR4
-JSRR R6
+LDI R5, VECTOR4
 
 ADD R1, R5, #0
 
@@ -468,8 +464,7 @@ GOTOTHISTHING
 ADD R2, R3, #0
 
 SKIPPY
-LD R6, VECTOR5
-JSRR R6
+LDI R5, VECTOR5
 
 ADD R1, R5, #0
 ADD R5, R2, #0
@@ -486,12 +481,18 @@ BRnz NEXT8
 BR ERRORPRINTOUT_1
 
 NEXT8
+LD R4, NUMERO15 
+NOT R5, R5
+ADD R5, R5, #1
+
+ADD R5, R4, R5
+
 loop5
 	ADD R5, R5, #0
 	BRnz loop5_END	
 	ADD R1, R1, R1 		; Left shifting	
 	ADD R5, R5, #-1 	; Decrements count
-	BRp loop5			; Repeat through loop, until it stops at 0
+	BRp loop5		; Repeat through loop, until it stops at 0
 loop5_END
 ADD R4, R2, #0
 
@@ -555,6 +556,7 @@ NEGZERO .FILL #-48
 NEGNINE .FILL #-57
 CHECKFORONE .FILL #2
 RESETZERO .FILL #0
+NUMERO15 .FILL #15
 NUMBER15 .FILL #-15
 myNewLine .FILL -x0A
 ASCII_CONVERT3 .FILL #-49
@@ -577,26 +579,35 @@ ERRORPRINT2 .STRINGZ "\nError: Invalid Number. Going Back to Menu\n"
 
 ST R7, R7_BACKUP_4400
 
-LD R6, VECTOR6
-JSRR R6
+LDI R5, VECTOR6
 
 ADD R1, R5, #0
+ADD R3, R1, #0
 
 LD R4, COUNTME
 LD R5, COUNTALL
-LEFTSHIFTING1
-	ADD R1, R1, #0
-	BRn FINALCOUNT
+
+RESET
+	ADD R1, R3, #0
+LEFTSHIFT_1
+	ADD R5, R5, #0
+	BRz FINEND
 	ADD R1, R1, R1
-	ADD R4, R4, #1
 	ADD R5, R5, #-1
-BRp LEFTSHIFTING1
+BRzp LEFTSHIFT_1
+
+FINEND
+ADD R1, R1, #0
+BRn FINALCOUNT
+ADD R4, R4, #1
+NOT R6, R4
+ADD R6, R6, #1
+LD R5, COUNTALL
+ADD R5, R5, R6
+BRzp RESET
+BR NEGATIVESTUFF
 
 FINALCOUNT
-
-LD R5, NEGCOUNT
-ADD R5, R4, R5
-BRz NEGATIVESTUFF
 
 LEA R0, firstAvailable
 PUTS
@@ -623,6 +634,7 @@ ENDTHISLOOP2_1
 LEA R0, firstAvailable2
 PUTS
 BR END123
+
 NEGATIVESTUFF
 
 LEA R0, noneAvailable
@@ -635,37 +647,19 @@ LD R7, R7_BACKUP_4400
 
 RET
 
-NEGCOUNT .FILL #-16
 SUB4 .FILL #-10
 ASCII_ONE4 .FILL #49
 ASCII_CONVERT4 .FILL #48
 anotherNLine .FILL x0A
 COUNTME .FILL #0
-COUNTALL .FILL #16
+COUNTALL .FILL #15
 R7_BACKUP_4400 .BLKW #1
 VECTOR6 .FILL x5000
 firstAvailable .STRINGZ "\nThe first available machine is number "
 firstAvailable2 .STRINGZ ".\n"
 noneAvailable .STRINGZ "\nThere are no machines available at the moment.\n"
 
-;-----------------------------------------------------------------------------------------------------------------
-; Subroutine: BUSYNESS_VECTOR
-; Inputs: None
-; Postcondition: 
-; The subroutine loads the register R5 with an address.
-; Return Value (R5): the address for busyness
-;-----------------------------------------------------------------------------------------------------------------
-
 .orig x5000
-ST R7, R7_BACKUP_5000
-
-LD R5, BUSYNESS
-
-LD R7, R7_BACKUP_5000
-
-RET
-
-BUSYNESS .FILL x6A13
-R7_BACKUP_5000 .BLKW #1
+BUSYNESS .FILL xFFF0
 
 .END
